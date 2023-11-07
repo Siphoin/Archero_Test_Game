@@ -5,24 +5,36 @@ using System;
 using Zenject;
 using UnityEngine.Events;
 using Archero.Bullets;
+using Archero.Extensions;
 
 namespace Archero
 {
     public class Player : MonoBehaviour, IPlayer
     {
-        private int _currentHealth;
+        [SerializeField] private int _currentHealth;
+        private BulletType _currentBehaviourShooting = BulletType.Ground;
         public event UnityAction<int> OnHit;
-        public event UnityAction OnDealth;
+        public event EventHandler OnDealth;
         private StateMachine _stateMachine;
         private Rigidbody _body;
-        private WeaponData _weaponData;
+        private WeaponPlayerData _weaponData;
         private BulletPool _bulletPool;
         private IJoystick _joystick;
 
         [SerializeField] private PlayerData _playerData;
-        
+        private Transform _targetBullets;
 
         public int Health => _currentHealth;
+
+        public bool IsDied => _currentHealth <= 0;
+
+        public Vector3 Position => transform.position;
+
+        public Vector3 Forward => transform.forward;
+
+        public WeaponPlayerData Weapon => _weaponData;
+
+        public Transform Transform => transform;
 
         private void Start()
         {
@@ -74,6 +86,8 @@ namespace Archero
         public void Move()
         {
             Vector3 movement = GetJoystickDirection();
+            movement = Camera.main.GetDesiredMovement(movement.z, movement.x);
+
             _body.velocity = movement * _playerData.SpeedMovement;
         }
 
@@ -99,6 +113,8 @@ namespace Archero
         {
             Vector3 movement = GetJoystickDirection();
 
+            movement = Camera.main.GetDesiredMovement(movement.z, movement.x);
+
             Quaternion quaternion = Quaternion.LookRotation(movement);
 
             _body.MoveRotation(quaternion);
@@ -108,6 +124,16 @@ namespace Archero
         public void Hit(int value)
         {
             _currentHealth = Mathf.Clamp(_currentHealth - value, 0, _playerData.Health);
+
+            if (_currentHealth <= 0)
+            {
+                _joystick.OnUp -= JoystickOnUp;
+                _joystick.OnDown -= JoystickOnDown;
+
+                _stateMachine.StopState();
+
+                OnDealth?.Invoke(this, new DeathEventArgs());
+            }
         }
 
         [Inject]
@@ -116,7 +142,7 @@ namespace Archero
             _joystick = joystick;
         }
 
-        public void SetWeaponData(WeaponData weapon)
+        public void SetWeaponData(WeaponPlayerData weapon)
         {
             if (!weapon)
             {
@@ -129,8 +155,44 @@ namespace Archero
         public void Shoot()
         {
             var bullet =_bulletPool.GetFreeBullet();
+            bullet.SetBehaviour(_currentBehaviourShooting);
+            bullet.SetFollowTarget(_targetBullets);
             bullet.SetPosition(transform);
             bullet.SetRotation(transform);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (_weaponData != null)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(transform.position, _weaponData.Radius);
+            }
+        }
+
+        public void Rotate(Vector3 position)
+        {
+            Vector3 direction = position - transform.position;
+
+            Quaternion root = Quaternion.LookRotation(direction);
+
+            Quaternion rotate = root;
+
+            rotate.x = 0;
+
+            rotate.z = 0;
+
+            transform.rotation = rotate;
+        }
+
+        public void SetBehaviourShoot(BulletType behavipurBullet)
+        {
+            _currentBehaviourShooting = behavipurBullet;
+        }
+
+        public void SetTargetForBullets(Transform target)
+        {
+            _targetBullets = target;
         }
     }
 }

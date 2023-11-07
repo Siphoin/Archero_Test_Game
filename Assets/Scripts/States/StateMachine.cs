@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Archero.States
 {
@@ -36,6 +37,23 @@ namespace Archero.States
             Type stateType = typeof(T);
 
             SetState(stateType);
+        }
+
+        public void AddState<T>(IState state) where T : IState
+        {
+            Type stateType = typeof(T);
+
+            if (state is null)
+            {
+                throw new ArgumentNullException("state argument is null");
+            }
+
+            if (_states.ContainsKey(stateType))
+            {
+                throw new InvalidOperationException($"key of state {stateType} already exits of state machine");
+            }
+
+            _states.Add(stateType, state);
         }
 
         private void SetState(Type stateType)

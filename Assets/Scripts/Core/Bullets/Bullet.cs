@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using Archero.Enemies;
 
 namespace Archero.Bullets
 {
@@ -7,12 +8,16 @@ namespace Archero.Bullets
     public class Bullet : MonoBehaviour, IBullet
     {
         [SerializeField]  private BulletOwner _owner;
+        [SerializeField] private BulletType _type;
+
+        private Transform _parent;
 
         [SerializeField, Min(1)] private int _damage = 1;
 
         private Rigidbody _body;
 
         [SerializeField, Min(1)] private float _speed = 10;
+        private Transform _target;
 
         private void Awake()
         {
@@ -20,20 +25,37 @@ namespace Archero.Bullets
             {
                 throw new NullReferenceException("bullet must have component Rigidbody");
             }
+
+            _parent = transform.parent;
         }
 
         private void FixedUpdate()
         {
-            _body.velocity = transform.forward * _speed;
-            _body.angularVelocity = Vector3.zero;
+            Vector3 direction = transform.forward;
+
+            if (_type == BulletType.Ground)
+            {
+                _body.velocity = direction * _speed;
+                
+            }
+
+            else if (_type == BulletType.ToTarget)
+            {
+                if (_target is null)
+                {
+                    throw new InvalidOperationException("target for bullet not seted");
+                }
+
+                direction = Vector3.MoveTowards(transform.position, _target.position, _speed * Time.fixedDeltaTime);
+                transform.position = direction;
+            }
+
+          _body.angularVelocity = Vector3.zero;
         }
 
-        private void OnCollisionEnter(Collision collision)
+        private void OnTriggerEnter(Collider other)
         {
-            GameObject gameObject = collision.gameObject;
-
-
-            if (gameObject.TryGetComponent(out Wall _))
+            if (other.TryGetComponent(out Wall _))
             {
                 Hide();
             }
@@ -41,17 +63,28 @@ namespace Archero.Bullets
             if (_owner == BulletOwner.Player)
             {
 
-                if (gameObject.TryGetComponent(out IPlayer player))
+                if (other.TryGetComponent(out IEnemy enemy))
+                {
+                    enemy.Hit(_damage);
+
+                    Hide();
+                }
+            }
+
+            if (_owner == BulletOwner.Enemy)
+            {
+
+                if (other.TryGetComponent(out IPlayer player))
                 {
                     player.Hit(_damage);
 
                     Hide();
                 }
             }
-              
+
         }
 
-        private void Hide()
+        public void Hide()
         {
             gameObject.SetActive(false);
 
@@ -66,6 +99,23 @@ namespace Archero.Bullets
         public void SetRotation(Transform root)
         {
             transform.rotation = root.rotation;
+        }
+
+        public void SetBehaviour(BulletType type)
+        {
+            _type = type;
+        }
+
+        public void SetFollowTarget(Transform target)
+        {
+            _target = target;
+        }
+
+        private void OnDisable()
+        {
+            _target = null;
+
+            transform.localPosition = Vector3.zero;
         }
     }
 }

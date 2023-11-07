@@ -9,7 +9,7 @@ namespace Archero.DI.Installers
     {
         [SerializeField] private Player _prefab;
         [SerializeField] private SpawnPoint _spawnPoint;
-        [SerializeField] private WeaponData _weapon;
+        [SerializeField] private WeaponPlayerData _weapon;
 
         public override void InstallBindings()
         {
@@ -23,7 +23,7 @@ namespace Archero.DI.Installers
                 throw new NullReferenceException("spawn point not seted for player installer");
             }
 
-            var player = Container.InstantiatePrefabForComponent<Player>(_prefab, _spawnPoint.GetPosition(), Quaternion.identity, null);
+            var player = Container.InstantiatePrefabForComponent<Player>(_prefab, _spawnPoint.Position, Quaternion.identity, null);
             player.SetWeaponData(_weapon);
             Container.Bind<IPlayer>().To<Player>().FromInstance(player);
         }

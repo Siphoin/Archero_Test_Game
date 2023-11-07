@@ -24,7 +24,6 @@ namespace Archero.Bullets
             }
 
             Transform rootContainer = new GameObject($"{root.name}_{nameof(BulletPool)}").transform;
-            rootContainer.SetParent(root);
             var prefab = weapon.PrefabBullet;
             _container = new PoolMono<Bullet>(prefab, rootContainer, _countOnStart, true);
         }

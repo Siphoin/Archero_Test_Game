@@ -2,11 +2,12 @@
 
 namespace Archero
 {
-    public class SpawnPoint : MonoBehaviour
+    public class SpawnPoint : MonoBehaviour, ISpawnPoint
     {
-        public Vector3 GetPosition ()
-        {
-            return transform.position;
-        }
+        [SerializeField] private SpawnPointType _type;
+
+        public Vector3 Position => transform.position;
+
+        public SpawnPointType Type => _type;
     }
 }
