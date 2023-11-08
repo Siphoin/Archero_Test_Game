@@ -1,6 +1,5 @@
 ﻿using Archero.Enemies;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,6 +14,7 @@ namespace Archero.Repositories
         public event Action OnAllTargetsKilled;
 
         public event Action<int> OnKillAward;
+
         public void Initialize()
         {
             SceneManager.sceneLoaded += OnSceneLoaded;

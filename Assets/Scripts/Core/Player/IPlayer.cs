@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Archero
 {
-    public interface IPlayer : IMovable, IRotatable, IHitable, IShootable, ILocatable, ITransformable
+    public interface IPlayer : IMovable, IHideable, IRotatable, IHitable, IShootable, ILocatable, ITransformable, IActivatable
     {
         WeaponPlayerData Weapon {  get; }
         Vector3 Forward { get; }

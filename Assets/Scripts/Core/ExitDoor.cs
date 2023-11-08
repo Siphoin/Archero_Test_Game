@@ -11,7 +11,9 @@ namespace Archero.Core
     public class ExitDoor : MonoBehaviour
     {
         private bool _canExit;
+
         [SerializeField, Min(0)] private float _durationChangeColor = 0.5F;
+
         private Renderer _renderer;
         private LevelRepository _levelRepository;
         private LevelService _levelService;

@@ -6,6 +6,8 @@ using Zenject;
 using UnityEngine.Events;
 using Archero.Bullets;
 using Archero.Extensions;
+using Archero.Services;
+using Archero.Animation;
 
 namespace Archero
 {
@@ -20,13 +22,21 @@ namespace Archero
         private WeaponPlayerData _weaponData;
         private BulletPool _bulletPool;
         private IJoystick _joystick;
+        private RigidbodyConstraints _defaultBodyConstraints;
 
         [SerializeField] private PlayerData _playerData;
+
         private Transform _targetBullets;
+
+        private LevelService _levelService;
+
+        private IAnimationController _animationController;
 
         public int Health => _currentHealth;
 
         public bool IsDied => _currentHealth <= 0;
+
+        public bool IsActive { get; protected set; }
 
         public Vector3 Position => transform.position;
 
@@ -45,6 +55,38 @@ namespace Archero
                 throw new NullReferenceException("rigidbody not seted on Player");
             }
 
+
+            if (!TryGetComponent(out _animationController))
+            {
+                Debug.LogWarning($"animation controller not found on Enemy {name}");
+            }
+
+            InitializeStates();
+
+            _defaultBodyConstraints = _body.constraints;
+
+            _joystick.OnUp += JoystickOnUp;
+            _joystick.OnDown += JoystickOnDown;
+
+            _currentHealth = _playerData.Health;
+
+            _levelService = Startup.GetService<LevelService>();
+
+            _levelService.OnTickEnd += OnTickEnd;
+        }
+
+        private void Update()
+        {
+            _stateMachine?.Update();
+        }
+
+        private void FixedUpdate()
+        {
+            _stateMachine?.FixedUpdate();
+        }
+
+        private void InitializeStates()
+        {
             var states = new OwneringState<IPlayer>[]
             {
                 new ShootPlayerState(),
@@ -58,26 +100,16 @@ namespace Archero
 
             _stateMachine = new StateMachine();
             _stateMachine.Initialize(states);
-
-            _joystick.OnUp += JoystickOnUp;
-            _joystick.OnDown += JoystickOnDown;
-
-            _currentHealth = _playerData.Health;
         }
 
-       
-
-        private void Update()
+        private void OnTickEnd()
         {
-            _stateMachine?.Update();
+            _levelService.OnTickEnd -= OnTickEnd;
+
+            Activate();
         }
 
-        private void FixedUpdate()
-        {
-            _stateMachine?.FixedUpdate();
-        }
-
-        private Vector3 GetJoystickDirection ()
+        private Vector3 GetJoystickDirection()
         {
             return new Vector3(_joystick.Horizontal, 0f, _joystick.Vertical).normalized;
         }
@@ -132,14 +164,10 @@ namespace Archero
 
                 _stateMachine.StopState();
 
+                Hide();
+
                 OnDealth?.Invoke(this, new DeathEventArgs());
             }
-        }
-
-        [Inject]
-        private void Construct(IJoystick joystick)
-        {
-            _joystick = joystick;
         }
 
         public void SetWeaponData(WeaponPlayerData weapon)
@@ -154,7 +182,7 @@ namespace Archero
 
         public void Shoot()
         {
-            var bullet =_bulletPool.GetFreeBullet();
+            var bullet = _bulletPool.GetFreeBullet();
             bullet.SetBehaviour(_currentBehaviourShooting);
             bullet.SetFollowTarget(_targetBullets);
             bullet.SetPosition(transform);
@@ -194,5 +222,51 @@ namespace Archero
         {
             _targetBullets = target;
         }
+
+        public void Activate()
+        {
+            IsActive = true;
+
+            _stateMachine.SetStateByDefault();
+
+            _body.constraints = _defaultBodyConstraints;
+        }
+
+        public void Deactivate()
+        {
+            IsActive = false;
+
+            _stateMachine.StopState();
+
+            _body.constraints = RigidbodyConstraints.FreezeAll;
+        }
+
+        public void Hide()
+        {
+            if (_animationController != null)
+            {
+                _animationController.OnEnd += OnEndAnimations;
+                _animationController.Play();
+            }
+
+            else
+            {
+                gameObject.SetActive(false);
+            }
+        }
+
+        private void OnEndAnimations()
+        {
+            _animationController.OnEnd -= OnEndAnimations;
+
+            gameObject.SetActive(false);
+        }
+
+        [Inject]
+        private void Construct(IJoystick joystick)
+        {
+            _joystick = joystick;
+        }
     }
+
 }

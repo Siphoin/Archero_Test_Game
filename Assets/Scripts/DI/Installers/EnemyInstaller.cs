@@ -15,6 +15,8 @@ namespace Archero.DI.Installers
 
         [SerializeField, Min(1)] private int _spawnCount = 4;
 
+        private Transform _container;
+
         public override void InstallBindings()
         {
             if (_enemies.Length == 0)
@@ -30,6 +32,8 @@ namespace Archero.DI.Installers
                 throw new ArrayIsEmptyException("spawn points array is empty");
             }
 
+            _container = new GameObject("Enemies").transform;
+
             for (int i = 0; i < _spawnCount; i++)
             {
                 Spawn();
@@ -42,9 +46,18 @@ namespace Archero.DI.Installers
 
             IEnemy newEnemy = Container.InstantiatePrefabForComponent<IEnemy>(enemyType);
 
+            newEnemy.Transform.position = GetRandomPoint();
+
+            newEnemy.Transform.SetParent(_container);
+        }
+
+        private Vector3 GetRandomPoint ()
+        {
             ILocatable point = _spawnPoints.GetRandomElement();
 
-            newEnemy.Transform.position = point.Position;
+            Vector3 randomPoint = point.Position + Random.insideUnitSphere * 2;
+
+            return randomPoint;
         }
     }
 }

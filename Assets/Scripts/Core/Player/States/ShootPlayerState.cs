@@ -19,7 +19,7 @@ namespace Archero.States
         {
             get
             {
-                return _targets.OrderBy(t => Vector3.Distance(Owner.Position, t.Position)).FirstOrDefault(x => !x.IsDied);
+                return _targets.OrderBy(t => Vector3.Distance(Owner.Position, t.Position)).FirstOrDefault(x => !x.IsDied && x.IsActive);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Archero.States
                     {
                         bool contains = _targets.Contains(enemy);
 
-                        if (!contains && !enemy.IsDied)
+                        if (!contains && !enemy.IsDied && enemy.IsActive)
                         {
                             enemy.OnDealth += OnDealthEnemy;
                             _targets.Add(enemy);
@@ -91,7 +91,6 @@ namespace Archero.States
 
             while (true)
             {
-                await UniTask.WaitUntil(() => CurrentTarget != null, cancellationToken: _cancelToken.Token);
 
                 await UniTask.Delay(timeSpan, cancellationToken: _cancelToken.Token);
 
@@ -104,7 +103,8 @@ namespace Archero.States
                     Owner.SetTargetForBullets(CurrentTarget.Transform);
                 }
 
-                
+
+                await UniTask.WaitUntil(() => CurrentTarget != null, cancellationToken: _cancelToken.Token);
 
                 Owner.Shoot();
 

@@ -9,6 +9,7 @@ namespace Archero.Enemies.States
     public class ShootEnemyState : OwneringState<IEnemy>, IUpdatableState, IFixedUpdatableState
     {
         private CancellationTokenSource _cancelToken;
+
         public override void Enter()
         {
             _cancelToken = new CancellationTokenSource();

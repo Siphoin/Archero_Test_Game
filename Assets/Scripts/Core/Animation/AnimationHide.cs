@@ -14,5 +14,6 @@ namespace Archero.Animation
         {
             return false;
         }
+
     }
 }

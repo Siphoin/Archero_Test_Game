@@ -7,9 +7,9 @@ namespace Archero.States
     {
         private Dictionary<Type, IState> _states;
 
-        private IState _current;
+        public IState Current { get; private set; }
 
-        private Type DefaultState => _states.FirstOrDefault().Value.GetType();
+        public IState DefaultState => _states.FirstOrDefault().Value;
 
         public void Initialize(IEnumerable<IState> states)
         {
@@ -44,47 +44,47 @@ namespace Archero.States
                 throw new KeyNotFoundException($"state with key {stateType.Name} not found");
             }
 
-            _current?.Exit();
-            _current = _states[stateType];
-            _current.Enter();
+            Current?.Exit();
+            Current = _states[stateType];
+            Current.Enter();
         }
 
         public void SetStateByDefault ()
         {
-            SetState(DefaultState);
+            SetState(DefaultState.GetType());
         }
 
         public void StopState()
         {
-            _current?.Exit();
-            _current = null;
+            Current?.Exit();
+            Current = null;
         }
         
 
         public void Update()
         {
-            if (_current is null)
+            if (Current is null)
             {
                 return;
             }
 
-            if (_current is IUpdatableState)
+            if (Current is IUpdatableState)
             {
-                var updateState = _current as IUpdatableState;
+                var updateState = Current as IUpdatableState;
                 updateState.Update();
             }
         }
 
         public void FixedUpdate()
         {
-            if (_current is null)
+            if (Current is null)
             {
                 return;
             }
 
-            if (_current is IFixedUpdatableState)
+            if (Current is IFixedUpdatableState)
             {
-                var fixedUpdateState = _current as IFixedUpdatableState;
+                var fixedUpdateState = Current as IFixedUpdatableState;
                 fixedUpdateState.FixedUpdate();
             }
         }

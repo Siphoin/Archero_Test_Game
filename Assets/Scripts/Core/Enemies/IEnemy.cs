@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Archero.Enemies
 {
-    public interface IEnemy : IMovable, IRotatable, IHitable, IShootable, IHideable, ILocatable, ITransformable
+    public interface IEnemy : IMovable, IRotatable, IHitable, IShootable, IHideable, ILocatable, ITransformable, IActivatable
     {
         EnemyData Stats { get; }
         Vector3 PositionTarget { get; }

@@ -9,15 +9,16 @@ namespace Archero.Bullets
     {
         [SerializeField]  private BulletOwner _owner;
         [SerializeField] private BulletType _type;
-
-        private Transform _parent;
+        private RigidbodyConstraints _defaultBodyConstraints;
 
         [SerializeField, Min(1)] private int _damage = 1;
+        [SerializeField, Min(1)] private float _speed = 10;
 
         private Rigidbody _body;
 
-        [SerializeField, Min(1)] private float _speed = 10;
         private Transform _target;
+
+        public bool IsActive { get; private set; }
 
         private void Awake()
         {
@@ -26,7 +27,7 @@ namespace Archero.Bullets
                 throw new NullReferenceException("bullet must have component Rigidbody");
             }
 
-            _parent = transform.parent;
+            _defaultBodyConstraints = _body.constraints;
         }
 
         private void FixedUpdate()
@@ -87,8 +88,6 @@ namespace Archero.Bullets
         public void Hide()
         {
             gameObject.SetActive(false);
-
-            // TODO: add hiding animation
         }
 
         public void SetPosition(Transform root)
@@ -116,6 +115,20 @@ namespace Archero.Bullets
             _target = null;
 
             transform.localPosition = Vector3.zero;
+        }
+
+        public void Activate()
+        {
+            IsActive = true;
+
+            _body.constraints = _defaultBodyConstraints;
+        }
+
+        public void Deactivate()
+        {
+            IsActive = false;
+
+            _body.constraints = RigidbodyConstraints.FreezeAll;
         }
     }
 }

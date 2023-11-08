@@ -6,6 +6,7 @@ namespace Archero.States
     {
         public override void Enter()
         {
+            Debug.Log("player enter on moving");
         }
 
         public override void Exit()

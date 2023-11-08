@@ -7,7 +7,7 @@ namespace Archero.Enemies.States
     {
         public override void Enter()
         {
-            Debug.Log("enemy waiting start game");
+            Debug.Log("enemy start waiting start game");
         }
 
         public override void Exit()
@@ -24,6 +24,7 @@ namespace Archero.Enemies.States
 
             if (distanceToMove <= Owner.Stats.DistanceToStartChase)
             {
+                Owner.Activate();
                 Owner.BeginMove();
             }
         }

@@ -9,6 +9,7 @@ using System;
 using Archero.Enemies.States;
 using Archero.Repositories;
 using Archero.Animation;
+using Archero.Services;
 
 namespace Archero.Enemies
 {
@@ -17,20 +18,31 @@ namespace Archero.Enemies
     public abstract class EnemyBase : MonoBehaviour, IEnemy
     {
         [SerializeField] private int _currentHealth;
+
+        private RigidbodyConstraints _defaultBodyConstraints;
+        private bool _isActive;
         public event UnityAction<int> OnHit;
         public event EventHandler OnDealth;
         private StateMachine _stateMachine;
         private BulletPool _bulletPool;
         private NavMeshAgent _agent;
         private Rigidbody _body;
-        private IPlayer _player;
-        private IAnimationController _animationController;
+
+        private LevelService _levelService;
 
         [SerializeField] private EnemyData _stats;
 
+        private IPlayer _player;
+
+        private IAnimationController _animationController;
+
         public int Health => _currentHealth;
 
+        protected float OffsetAgent { get => _agent.baseOffset; set => _agent.baseOffset = value; }
+
         public bool IsDied => _currentHealth <= 0;
+
+        public bool IsActive => _isActive && _stateMachine.Current != _stateMachine.DefaultState;
 
         public EnemyData Stats => _stats;
 
@@ -39,8 +51,6 @@ namespace Archero.Enemies
         public Vector3 Position => transform.position;
 
         public Transform Transform => transform;
-
-        protected float OffsetAgent { get => _agent.baseOffset; set => _agent.baseOffset = value; }
 
         protected virtual void Start()
         {
@@ -71,14 +81,13 @@ namespace Archero.Enemies
 
             _player.OnDealth += OnDealthPlayer;
 
+            _defaultBodyConstraints = _body.constraints;
+
+            _levelService = Startup.GetService<LevelService>();
+
+            _levelService.OnTickEnd += OnTickEnd;
+
             Startup.GetRepository<LevelRepository>().Register(this);
-        }
-
-        private void OnDealthPlayer(object sender, EventArgs e)
-        {
-            _player.OnDealth -= OnDealthPlayer;
-
-            _stateMachine.StopState();
         }
 
         private void Update()
@@ -89,6 +98,20 @@ namespace Archero.Enemies
         private void FixedUpdate()
         {
             _stateMachine?.FixedUpdate();
+        }
+
+        private void OnTickEnd()
+        {
+            _levelService.OnTickEnd -= OnTickEnd;
+
+            Activate();
+        }
+
+        private void OnDealthPlayer(object sender, EventArgs e)
+        {
+            _player.OnDealth -= OnDealthPlayer;
+
+            _stateMachine.StopState();
         }
 
         public void Hit(int value)
@@ -190,6 +213,28 @@ namespace Archero.Enemies
             _animationController.OnEnd -= OnEndAnimations;
 
             gameObject.SetActive(false);
+        }
+
+        public void Activate()
+        {
+            _isActive = true;
+
+            _stateMachine.SetStateByDefault();
+
+            _body.constraints = _defaultBodyConstraints;
+
+            _agent.isStopped = false;
+        }
+
+        public void Deactivate()
+        {
+            _isActive = false;
+
+            _stateMachine.StopState();
+
+            _body.constraints = RigidbodyConstraints.FreezeAll;
+
+            _agent.isStopped = true;
         }
 
         [Inject]

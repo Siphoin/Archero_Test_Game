@@ -9,8 +9,9 @@ namespace Archero.Animation
         private int _count;
         private int _countFinished;
 
-        private AnimationComponent[] _animationComponents;
         public event UnityAction OnEnd;
+
+        private AnimationComponent[] _animationComponents;
 
         private void Start()
         {

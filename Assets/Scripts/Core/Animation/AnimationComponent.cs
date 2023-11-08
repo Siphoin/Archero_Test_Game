@@ -8,6 +8,7 @@ namespace Archero.Animation
     {
         [SerializeField, Min(0.1f)] private float _duration = 0.3f;
         [SerializeField] private Ease _ease = Ease.Linear;
+
         public event UnityAction OnEnd;
 
         protected float Duration => _duration;

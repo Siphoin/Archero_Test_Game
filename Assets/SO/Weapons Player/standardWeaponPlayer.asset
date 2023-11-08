@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: standardWeaponPlayer
   m_EditorClassIdentifier: 
   _prefabBullet: {fileID: 7400389688176319917, guid: 5f1d2c2783aa01041b39776561e5c5a3, type: 3}
-  _delayShoot: 0.3
-  _radius: 1
+  _delayShoot: 0.7
+  _radius: 2.3

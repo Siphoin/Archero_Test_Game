@@ -20,9 +20,9 @@ namespace Archero.Enemies
 
             if (OffsetAgent == _startOffset)
             {
-                if (gameObject.TryGetComponent(out Wall _))
+                if (gameObject.TryGetComponent(out Wall wall))
                 {
-                    ChangeOffset(_startOffset * 2.5f, 1f).Forget();
+                    ChangeOffset(wall.Bounds.max.y * 1.5f, 1f).Forget();
                 }
             }
         }

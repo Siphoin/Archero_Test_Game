@@ -17,6 +17,8 @@ namespace Archero.Services
             IService[] services =
             {
                 new TimeService(),
+                new UIService(),
+                new UIMenuService(),
                 new LevelService(),
             };
 
