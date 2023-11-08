@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1828cd3d90b570f4a8495367e860f7db, type: 3}
   m_Name: flyEnemy
   m_EditorClassIdentifier: 
-  _speedMovement: 15
   _health: 4
+  _award: 3
+  _speedMovement: 15
   _timeOutStay: 2
   _distanceMove: 3
   _distanceToStartChase: 12

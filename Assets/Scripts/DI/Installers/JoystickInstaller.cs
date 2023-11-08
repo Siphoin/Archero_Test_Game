@@ -22,6 +22,9 @@ namespace Archero.DI.Installers
             }
 
             var joystick = Container.InstantiatePrefabForComponent<CustomJoystick>(_prefab, _prefab.transform.position, Quaternion.identity, _canvas.transform);
+            Vector3 positionJoystik = joystick.transform.localPosition;
+            positionJoystik.x = 0;
+            joystick.transform.localPosition = positionJoystik;
             Container.Bind<IJoystick>().To<CustomJoystick>().FromInstance(joystick);
         }
     }

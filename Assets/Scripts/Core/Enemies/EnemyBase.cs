@@ -7,7 +7,8 @@ using UnityEngine.Events;
 using Zenject;
 using System;
 using Archero.Enemies.States;
-using UnityEditor.Experimental.GraphView;
+using Archero.Repositories;
+using Archero.Animation;
 
 namespace Archero.Enemies
 {
@@ -23,6 +24,7 @@ namespace Archero.Enemies
         private NavMeshAgent _agent;
         private Rigidbody _body;
         private IPlayer _player;
+        private IAnimationController _animationController;
 
         [SerializeField] private EnemyData _stats;
 
@@ -52,6 +54,11 @@ namespace Archero.Enemies
                 throw new NullReferenceException("enemy must have component Rigidbody");
             }
 
+            if (!TryGetComponent(out _animationController))
+            {
+                Debug.LogWarning($"animation controller not found on Enemy {name}");
+            }
+
             _bulletPool = new BulletPool(transform, _stats.Weapon);
 
             InitializeStates();
@@ -63,6 +70,8 @@ namespace Archero.Enemies
             _currentHealth = _stats.Health;
 
             _player.OnDealth += OnDealthPlayer;
+
+            Startup.GetRepository<LevelRepository>().Register(this);
         }
 
         private void OnDealthPlayer(object sender, EventArgs e)
@@ -164,6 +173,22 @@ namespace Archero.Enemies
 
         public void Hide()
         {
+            if (_animationController != null)
+            {
+                _animationController.OnEnd += OnEndAnimations;
+                _animationController.Play();
+            }
+
+            else
+            {
+                gameObject.SetActive(false);
+            }
+        }
+
+        private void OnEndAnimations()
+        {
+            _animationController.OnEnd -= OnEndAnimations;
+
             gameObject.SetActive(false);
         }
 

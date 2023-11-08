@@ -48,8 +48,6 @@ namespace Archero.States
 
         public void FixedUpdate()
         {
-            if (CurrentTarget is null)
-            {
                 var cast = Physics.SphereCastAll(Owner.Position, Owner.Weapon.Radius, Owner.Forward);
 
                 foreach (var item in cast)
@@ -68,12 +66,11 @@ namespace Archero.States
 
                     }
                 }
-            }
 
-            else
-            {
+                if (CurrentTarget != null)
+                {
                 Owner.Rotate(CurrentTarget.Position);
-            }
+                }
                 
 
 
