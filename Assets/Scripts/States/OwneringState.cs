@@ -16,7 +16,6 @@ namespace Archero.States
             {
                 Owner = owner;
             }
-
             else
             {
                 throw new InvalidOperationException("owner not is null");

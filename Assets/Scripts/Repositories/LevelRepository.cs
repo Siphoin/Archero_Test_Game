@@ -31,12 +31,12 @@ namespace Archero.Repositories
 
         public void Register (IEnemy enemy)
         {
-            enemy.OnDealth += OnDealth;
+            enemy.OnDeath += OnDeath;
 
             _requireCountKill++;
         }
 
-        private void OnDealth(object sender, EventArgs e)
+        private void OnDeath(object sender, EventArgs e)
         {
             IEnemy enemy = sender as IEnemy;
 
@@ -46,7 +46,7 @@ namespace Archero.Repositories
 
             OnKillAward?.Invoke(_moneyCollected);
 
-            enemy.OnDealth -= OnDealth;
+            enemy.OnDeath -= OnDeath;
             if (_killCount == _requireCountKill)
             {
                 OnAllTargetsKilled?.Invoke();

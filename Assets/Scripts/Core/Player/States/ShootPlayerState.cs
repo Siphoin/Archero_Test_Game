@@ -60,7 +60,7 @@ namespace Archero.States
 
                         if (!contains && !enemy.IsDied && enemy.IsActive)
                         {
-                            enemy.OnDealth += OnDealthEnemy;
+                            enemy.OnDeath += OnDeathEnemy;
                             _targets.Add(enemy);
                         }
 
@@ -76,11 +76,11 @@ namespace Archero.States
 
         }
 
-        private void OnDealthEnemy(object sender, EventArgs e)
+        private void OnDeathEnemy(object sender, EventArgs e)
         {
             IEnemy enemy = sender as IEnemy;
 
-            enemy.OnDealth -= OnDealthEnemy;
+            enemy.OnDeath -= OnDeathEnemy;
 
             _targets.Remove(enemy);
         }

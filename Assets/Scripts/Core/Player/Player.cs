@@ -16,7 +16,7 @@ namespace Archero
         [SerializeField] private int _currentHealth;
         private BulletType _currentBehaviourShooting = BulletType.Ground;
         public event UnityAction<int> OnHit;
-        public event EventHandler OnDealth;
+        public event EventHandler OnDeath;
         private StateMachine _stateMachine;
         private Rigidbody _body;
         private WeaponPlayerData _weaponData;
@@ -166,7 +166,7 @@ namespace Archero
 
                 Hide();
 
-                OnDealth?.Invoke(this, new DeathEventArgs());
+                OnDeath?.Invoke(this, new DeathEventArgs());
             }
         }
 
@@ -180,23 +180,7 @@ namespace Archero
             _weaponData = weapon;
         }
 
-        public void Shoot()
-        {
-            var bullet = _bulletPool.GetFreeBullet();
-            bullet.SetBehaviour(_currentBehaviourShooting);
-            bullet.SetFollowTarget(_targetBullets);
-            bullet.SetPosition(transform);
-            bullet.SetRotation(transform);
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (_weaponData != null)
-            {
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawWireSphere(transform.position, _weaponData.Radius);
-            }
-        }
+        public void Shoot() => _bulletPool.GetFreeBullet(transform, _currentBehaviourShooting, _targetBullets);
 
         public void Rotate(Vector3 position)
         {
@@ -260,6 +244,15 @@ namespace Archero
             _animationController.OnEnd -= OnEndAnimations;
 
             gameObject.SetActive(false);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (_weaponData != null)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(transform.position, _weaponData.Radius);
+            }
         }
 
         [Inject]

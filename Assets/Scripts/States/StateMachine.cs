@@ -20,10 +20,7 @@ namespace Archero.States
 
             _states = new Dictionary<Type, IState>();
 
-            foreach (var state in states)
-            {
-                _states.Add(state.GetType(), state);
-            }
+            _states = states.ToDictionary(state => state.GetType());
 
             SetStateByDefault();
 
@@ -68,9 +65,8 @@ namespace Archero.States
                 return;
             }
 
-            if (Current is IUpdatableState)
+            if (Current is IUpdatableState updateState)
             {
-                var updateState = Current as IUpdatableState;
                 updateState.Update();
             }
         }
@@ -82,9 +78,8 @@ namespace Archero.States
                 return;
             }
 
-            if (Current is IFixedUpdatableState)
+            if (Current is IFixedUpdatableState fixedUpdateState)
             {
-                var fixedUpdateState = Current as IFixedUpdatableState;
                 fixedUpdateState.FixedUpdate();
             }
         }

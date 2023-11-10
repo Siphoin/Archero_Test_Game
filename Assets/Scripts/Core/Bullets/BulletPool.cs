@@ -32,5 +32,26 @@ namespace Archero.Bullets
         {
             return _container.GetFreeElement();
         }
+
+        public IBullet GetFreeBullet(Transform transform, BulletType behaviourShooting = BulletType.Ground, Transform targetBullets = null)
+        {
+            var bullet = _container.GetFreeElement();
+
+            bullet.SetBehaviour(behaviourShooting);
+            bullet.SetFollowTarget(targetBullets);
+            bullet.SetPosition(transform);
+            bullet.SetRotation(transform);
+            return bullet;
+        }
+
+        public IBullet GetFreeBullet(Transform transform, Transform targetBullets = null)
+        {
+            var bullet = _container.GetFreeElement();
+
+            bullet.SetFollowTarget(targetBullets);
+            bullet.SetPosition(transform);
+            bullet.SetRotation(transform);
+            return bullet;
+        }
     }
 }

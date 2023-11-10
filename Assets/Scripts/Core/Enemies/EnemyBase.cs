@@ -22,7 +22,7 @@ namespace Archero.Enemies
         private RigidbodyConstraints _defaultBodyConstraints;
         private bool _isActive;
         public event UnityAction<int> OnHit;
-        public event EventHandler OnDealth;
+        public event EventHandler OnDeath;
         private StateMachine _stateMachine;
         private BulletPool _bulletPool;
         private NavMeshAgent _agent;
@@ -79,7 +79,7 @@ namespace Archero.Enemies
 
             _currentHealth = _stats.Health;
 
-            _player.OnDealth += OnDealthPlayer;
+            _player.OnDeath += OnDeathPlayer;
 
             _defaultBodyConstraints = _body.constraints;
 
@@ -107,9 +107,9 @@ namespace Archero.Enemies
             Activate();
         }
 
-        private void OnDealthPlayer(object sender, EventArgs e)
+        private void OnDeathPlayer(object sender, EventArgs e)
         {
-            _player.OnDealth -= OnDealthPlayer;
+            _player.OnDeath -= OnDeathPlayer;
 
             _stateMachine.StopState();
         }
@@ -120,7 +120,7 @@ namespace Archero.Enemies
 
             if (_currentHealth <= 0)
             {
-                OnDealth?.Invoke(this, new DeathEventArgs());
+                OnDeath?.Invoke(this, new DeathEventArgs());
 
                 _stateMachine.StopState();
 
@@ -184,14 +184,7 @@ namespace Archero.Enemies
         #endregion
 
 
-        public void Shoot()
-        {
-           var bullet =_bulletPool.GetFreeBullet();
-            bullet.SetFollowTarget(_player.Transform);
-            bullet.SetPosition(transform);
-            bullet.SetRotation(transform);
-            
-        }
+        public void Shoot() => _bulletPool.GetFreeBullet(transform, _player.Transform);
 
 
         public void Hide()

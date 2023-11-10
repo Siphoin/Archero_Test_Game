@@ -11,12 +11,12 @@ namespace Archero.UI
         {
             base.Awake();
 
-            _player.OnDealth += OnDealth;
+            _player.OnDeath += OnDeath;
         }
 
-        private void OnDealth(object sender, System.EventArgs e)
+        private void OnDeath(object sender, System.EventArgs e)
         {
-            _player.OnDealth -= OnDealth;
+            _player.OnDeath -= OnDeath;
 
             gameObject.SetActive(true);
         }

@@ -1,6 +1,6 @@
 ﻿namespace Archero
 {
-    public interface Initializiable
+    public interface Initializable
     {
         void Initialize();
     }

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Archero.Repositories
 {
-    public class RepositoryDb : Initializiable
+    public class RepositoryDb : Initializable
     {
         private Dictionary<Type, IRepository> _repositories;
         public RepositoryDb()
         {
-            _repositories = new Dictionary<Type, IRepository>();
+            _repositories = new();
         }
         public void Initialize()
         {
