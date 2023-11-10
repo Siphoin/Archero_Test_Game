@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Archero.Repositories
 {
-    public class RepositoryDb : Initializable
+    public class RepositoryDb : IInitializable
     {
         private Dictionary<Type, IRepository> _repositories;
         public RepositoryDb()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Archero.Services
 {
-    public class ServiceLocator : Initializable
+    public class ServiceLocator : IInitializable
     {
         private static Dictionary<Type, IService> _services;
 

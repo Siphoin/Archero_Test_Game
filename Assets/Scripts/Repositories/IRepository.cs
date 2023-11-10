@@ -1,6 +1,6 @@
 ﻿namespace Archero.Repositories
 {
-    public interface IRepository : Initializable
+    public interface IRepository : IInitializable
     {
     }
 }

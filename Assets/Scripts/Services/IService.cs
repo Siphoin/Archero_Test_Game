@@ -1,6 +1,6 @@
 ﻿namespace Archero.Services
 {
-    public interface IService : Initializable
+    public interface IService : IInitializable
     {
     }
 }
