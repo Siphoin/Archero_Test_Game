@@ -9,7 +9,7 @@ namespace Archero.Services
 
         public ServiceLocator()
         {
-            _services = new Dictionary<Type, IService>();
+            _services = new();
         }
 
         public void Initialize()
